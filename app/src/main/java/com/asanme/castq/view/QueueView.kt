@@ -1,8 +1,6 @@
 package com.asanme.castq.view
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -14,10 +12,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.asanme.castq.data.helper.VideoHelper
+import com.asanme.castq.view.ui.components.VideoItem
 import com.asanme.castq.viewmodel.QueueViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -25,11 +25,15 @@ import com.asanme.castq.viewmodel.QueueViewModel
 fun QueueView(
     navController: NavHostController
 ) {
-    var queue = QueueViewModel(navController)
-
     var urlText by rememberSaveable {
         mutableStateOf("remember the text")
     }
+
+    val context = LocalContext.current
+    val videoDatabase = VideoHelper.getVideoDatabase(context)
+    val queue = QueueViewModel(navController, videoDatabase)
+
+    val videos = queue.videoQueue
 
     Scaffold(
         topBar = {
@@ -49,15 +53,8 @@ fun QueueView(
                 contentPadding = innerPadding,
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                val list = (0..75).map { it.toString() }
-                items(count = list.size) {
-                    Text(
-                        text = list[it],
-                        style = MaterialTheme.typography.bodySmall,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp)
-                    )
+                items(count = videos.size) { index ->
+                    VideoItem(videoUrl = videos[index])
                 }
             }
         }

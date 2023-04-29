@@ -12,8 +12,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.asanme.castq.model.Routes
-import com.asanme.castq.ui.theme.CastQTheme
+import com.asanme.castq.data.model.Routes
+import com.asanme.castq.view.ui.theme.CastQTheme
 import com.asanme.castq.view.QueueView
 
 class MainActivity : ComponentActivity() {

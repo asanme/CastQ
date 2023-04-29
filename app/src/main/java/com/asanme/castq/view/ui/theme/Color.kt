@@ -1,4 +1,4 @@
-package com.asanme.castq.ui.theme
+package com.asanme.castq.view.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
