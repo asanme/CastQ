@@ -11,15 +11,15 @@ import com.asanme.castq.data.model.Video
 interface VideoDao {
 
     @Insert
-    fun insert(video: Video)
+    suspend fun insert(video: Video)
 
     @Update
-    fun update(video: Video)
+    suspend fun update(video: Video)
 
     @Delete
-    fun delete(video: Video)
+    suspend fun delete(video: Video)
 
     @Query("SELECT * FROM video_urls")
-    fun getAllVideos(): List<Video>
+    suspend fun getAllVideos(): List<Video>
 
 }

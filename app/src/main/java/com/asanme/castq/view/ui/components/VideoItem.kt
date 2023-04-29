@@ -19,7 +19,7 @@ import com.asanme.castq.data.model.Video
 
 @Composable
 fun VideoItem(
-    videoUrl: Video
+    video: Video
 ) {
     Card(
         elevation = CardDefaults.cardElevation(defaultElevation = 5.dp),
@@ -37,12 +37,18 @@ fun VideoItem(
                 style = MaterialTheme.typography.titleLarge,
                 textAlign = TextAlign.Center
             )
+
+            Text(
+                text = "Video URL: ${video.url}",
+                style = MaterialTheme.typography.titleLarge,
+                textAlign = TextAlign.Center
+            )
         }
     }
 }
 
 @Preview
 @Composable
-fun previewVideoItem() {
+private fun PreviewVideoItem() {
     VideoItem(Video(url = "random-url"))
 }
