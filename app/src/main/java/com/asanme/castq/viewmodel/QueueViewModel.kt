@@ -12,6 +12,7 @@ class QueueViewModel(
     private val navController: NavHostController,
     private val videoDatabase: VideoDatabase,
 ) : ViewModel() {
+    private val _videoDao = videoDatabase.videoDao()
     private var _videoQueue = mutableStateListOf<Video>()
     var videoQueue: List<Video> = _videoQueue
 
@@ -19,10 +20,16 @@ class QueueViewModel(
         getVideos()
     }
 
+    fun addVideoToQueue(newVideo: Video) {
+        viewModelScope.launch {
+            _videoDao.insert(newVideo)
+        }
+    }
+
     fun getVideos() {
         viewModelScope.launch {
             _videoQueue.clear()
-            _videoQueue.addAll(videoDatabase.videoDao().getAllVideos())
+            _videoQueue.addAll(_videoDao.getAllVideos())
         }
     }
 }
