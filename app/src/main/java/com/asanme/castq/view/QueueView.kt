@@ -24,7 +24,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -45,9 +44,11 @@ import androidx.navigation.NavHostController
 import com.asanme.castq.R
 import com.asanme.castq.data.helper.VideoHelper
 import com.asanme.castq.data.model.Video
-import com.asanme.castq.view.ui.components.VideoItem
+import com.asanme.castq.view.ui.components.TextFieldComponent
+import com.asanme.castq.view.ui.components.VideoItemComponent
 import com.asanme.castq.viewmodel.QueueViewModel
 
+// TODO Replace all string with stringResource
 @Composable
 fun QueueView(
     navController: NavHostController
@@ -103,6 +104,25 @@ private fun QueueViewTopBar(
 }
 
 @Composable
+@ExperimentalMaterial3Api
+@OptIn(ExperimentalMaterialApi::class)
+private fun QueueViewBottomModal(
+    queueViewModel: QueueViewModel,
+    content: @Composable () -> Unit
+) {
+    val modalState = queueViewModel.modalState.collectAsState()
+
+    return ModalBottomSheetLayout(
+        sheetState = modalState.value,
+        sheetShape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp),
+        sheetElevation = 10.dp,
+        sheetBackgroundColor = MaterialTheme.colorScheme.background,
+        sheetContent = { BottomSheetContent(queueViewModel) },
+        content = content
+    )
+}
+
+@Composable
 private fun QueueViewBody(
     queueViewModel: QueueViewModel
 ) {
@@ -116,23 +136,11 @@ private fun QueueViewBody(
     ) {
         if (videos.isEmpty()) {
             item {
-                Icon(
-                    painter = painterResource(id = R.drawable.video_queue),
-                    contentDescription = stringResource(id = R.string.empty_queue_description),
-                    modifier = Modifier.size(75.dp)
-                )
-
-                Box(modifier = Modifier.size(10.dp))
-
-                Text(
-                    stringResource(id = R.string.empty_queue)
-                )
+                NoVideosOnQueue()
             }
         } else {
-            items(
-                count = videos.size,
-            ) { index ->
-                VideoItem(
+            items(count = videos.size) { index ->
+                VideoItemComponent(
                     queueViewModel = queueViewModel,
                     video = videos[index]
                 )
@@ -142,76 +150,74 @@ private fun QueueViewBody(
 }
 
 @Composable
+private fun NoVideosOnQueue() {
+    Icon(
+        painter = painterResource(id = R.drawable.video_queue),
+        contentDescription = stringResource(id = R.string.empty_queue_description),
+        modifier = Modifier.size(75.dp)
+    )
+
+    Box(modifier = Modifier.size(10.dp))
+
+    Text(
+        stringResource(id = R.string.empty_queue)
+    )
+}
+
 @ExperimentalMaterial3Api
-@OptIn(ExperimentalMaterialApi::class)
-private fun QueueViewBottomModal(
-    queueViewModel: QueueViewModel,
-    content: @Composable () -> Unit
+@Composable
+private fun BottomSheetContent(
+    queueViewModel: QueueViewModel
 ) {
-    val modalState = queueViewModel.modalState.collectAsState()
     var urlState by rememberSaveable { mutableStateOf("") }
     var isFieldEmpty by rememberSaveable { mutableStateOf(false) }
 
-    return ModalBottomSheetLayout(
-        sheetState = modalState.value,
-        sheetShape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp),
-        sheetElevation = 10.dp,
-        sheetBackgroundColor = MaterialTheme.colorScheme.background,
-        sheetContent = {
-            Column(
-                verticalArrangement = Arrangement.spacedBy(10.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(10.dp),
-            ) {
-                Divider(
-                    thickness = 2.dp,
-                    modifier = Modifier
-                        .width(40.dp)
-                        .padding(5.dp),
-                )
+    Column(
+        verticalArrangement = Arrangement.spacedBy(10.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(10.dp),
+    ) {
+        Divider(
+            thickness = 2.dp,
+            modifier = Modifier
+                .width(40.dp)
+                .padding(5.dp),
+        )
 
-                OutlinedTextField(
-                    value = urlState,
-                    modifier = Modifier.fillMaxWidth(),
-                    textStyle = MaterialTheme.typography.bodyMedium,
-                    label = {
-                        Text(
-                            "Video URL",
-                            style = MaterialTheme.typography.bodyMedium,
-                        )
-                    },
-                    isError = isFieldEmpty,
-                    onValueChange = { url ->
-                        urlState = url
-                        isFieldEmpty = url.isEmpty()
-                    },
-                    trailingIcon = {
-                        if (isFieldEmpty) {
-                            Icon(
-                                imageVector = Icons.Default.Warning,
-                                contentDescription = stringResource(id = R.string.add_description)
-                            )
-                        }
-                    },
+        TextFieldComponent(
+            value = urlState,
+            onError = isFieldEmpty,
+            onValueChange = {
+                urlState = it
+                isFieldEmpty = it.isEmpty()
+            },
+            onErrorIcon = {
+                Icon(
+                    imageVector = Icons.Default.Warning,
+                    contentDescription = stringResource(id = R.string.add_description)
                 )
+            },
+            label = {
+                Text(
+                    "Video URL",
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+            },
+        )
 
-                Button(
-                    modifier = Modifier.fillMaxWidth(),
-                    onClick = {
-                        if (urlState.isNotEmpty()) {
-                            queueViewModel.addVideo(Video(url = urlState))
-                            queueViewModel.closeModal()
-                        } else {
-                            isFieldEmpty = true
-                        }
-                    },
-                ) {
-                    Text("Add to queue")
+        Button(
+            modifier = Modifier.fillMaxWidth(),
+            onClick = {
+                if (urlState.isNotEmpty()) {
+                    queueViewModel.addVideo(Video(url = urlState))
+                } else {
+                    isFieldEmpty = true
                 }
-            }
-        },
-        content = content
-    )
+            },
+        ) {
+            Text("Add to queue")
+        }
+    }
 }

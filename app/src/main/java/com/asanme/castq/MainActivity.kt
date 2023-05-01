@@ -8,7 +8,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -21,7 +21,6 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             CastQTheme {
-                // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
@@ -35,9 +34,12 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 private fun App() {
-    val context = LocalContext.current
     val navController = rememberNavController()
+    NavigationComponent(navController)
+}
 
+@Composable
+private fun NavigationComponent(navController: NavHostController) {
     NavHost(
         navController = navController,
         startDestination = Routes.QueueViewRoute.route

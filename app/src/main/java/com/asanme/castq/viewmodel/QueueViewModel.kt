@@ -16,7 +16,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterialApi::class)
 class QueueViewModel(
     private val navController: NavHostController,
-    private val videoDatabase: VideoDatabase,
+    videoDatabase: VideoDatabase,
 ) : ViewModel() {
     private val _videoDao = videoDatabase.videoDao()
     private var _videoQueue = mutableStateListOf<Video>()
@@ -33,7 +33,7 @@ class QueueViewModel(
         getVideos()
     }
 
-    fun closeModal() {
+    private fun closeModal() {
         viewModelScope.launch {
             _modalState.emit(ModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden))
         }
@@ -48,6 +48,7 @@ class QueueViewModel(
     fun addVideo(newVideo: Video) {
         viewModelScope.launch {
             _videoDao.insertVideo(newVideo)
+            closeModal()
         }
     }
 

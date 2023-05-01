@@ -27,7 +27,7 @@ import com.asanme.castq.viewmodel.QueueViewModel
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun VideoItem(
+fun VideoItemComponent(
     video: Video,
     queueViewModel: QueueViewModel
 ) {
@@ -40,41 +40,56 @@ fun VideoItem(
                 onLongClick = { queueViewModel.deleteVideo(video) }
             ) { }
     ) {
-        Row(
-            modifier = Modifier.fillMaxSize(),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            // TODO Add Image loading with Glide
-            Column(
-                modifier = Modifier.size(40.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.add_video),
-                    contentDescription = stringResource(id = R.string.add_description)
-                )
-            }
+        VideoItemBody(video)
+    }
+}
 
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 5.dp),
-                verticalArrangement = Arrangement.Center
-            ) {
-                Text(
-                    text = "This is a sample",
-                    style = MaterialTheme.typography.titleLarge,
-                    textAlign = TextAlign.Start
-                )
+@Composable
+private fun VideoItemBody(video: Video) {
+    Row(
+        modifier = Modifier.fillMaxSize(),
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        VideoThumbnail()
+        VideoInformation(video)
+    }
+}
 
-                Text(
-                    text = "Video URL: ${video.url}",
-                    style = MaterialTheme.typography.titleSmall,
-                    textAlign = TextAlign.Start
-                )
-            }
-        }
+@Composable
+private fun VideoInformation(video: Video) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 5.dp),
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text(
+            text = "This is a sample",
+            style = MaterialTheme.typography.titleLarge,
+            textAlign = TextAlign.Start
+        )
+
+        Text(
+            text = "Video URL: ${video.url}",
+            style = MaterialTheme.typography.titleSmall,
+            textAlign = TextAlign.Start,
+            maxLines = 1
+        )
+    }
+}
+
+@Composable
+private fun VideoThumbnail() {
+    Column(
+        modifier = Modifier.size(40.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        // TODO Add Image loading with Glide
+        Icon(
+            painter = painterResource(id = R.drawable.add_video),
+            contentDescription = stringResource(id = R.string.add_description)
+        )
     }
 }
